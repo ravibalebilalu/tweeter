@@ -4,8 +4,8 @@ from tweetapp import views
 from rest_framework.urlpatterns import format_suffix_patterns
 
 urlpatterns = [
-    path("tweets/",views.tweet_list),
-    path("tweets/<int:pk>/",views.tweet_detail),
+    path("tweets/",views.TweetList.as_view()),
+    path("tweets/<int:pk>/",views.TweetDetail.as_view()),
 ]
 
 urlpatterns  = format_suffix_patterns(urlpatterns)
