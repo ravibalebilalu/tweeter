@@ -27,7 +27,7 @@ def tweet_detail(request,pk):
         return JsonResponse(status=404)
     
     if request.method == "GET":
-        serializer = TweetSerializer()
+        serializer = TweetSerializer(tweet)
         return JsonResponse(serializer.data)
     
     elif request.method == "PUT":
