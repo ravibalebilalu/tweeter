@@ -1,42 +1,40 @@
-from django.http import HttpResponse, JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from rest_framework.parsers import JSONParser
+from rest_framework import status
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 from tweetapp.models import Tweet
 from tweetapp.serializers import TweetSerializer
 
-@csrf_exempt
-def tweet_list(request):
+
+@api_view(["GET","POST"])
+def tweet_list(request,format=None):
     if request.method == "GET":
         tweets = Tweet.objects.all()
         serializer = TweetSerializer(tweets,many=True)
-        return JsonResponse(serializer.data,safe=False)
-
+        return Response(serializer.data)
     elif request.method == "POST":
-        data = JSONParser().parse(request)
-        serializer = TweetSerializer(data=data)
+        serializer = TweetSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return JsonResponse(serializer.data,status=201)
-        return  JsonResponse(serializer.errors,status=400)
-    
+            return Response(serializer.data,status=status.HTTP_201_CREATED)
+        return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+@api_view(["GET","PUT","DELETE"])
+def tweet_detail(request,pk,format=None):
 
-def tweet_detail(request,pk):
     try:
         tweet = Tweet.objects.get(pk=pk)
     except Tweet.DoesNotExist:
-        return JsonResponse(status=404)
+        return Response(status=status.HTTP_404_NOT_FOUND)
     
     if request.method == "GET":
         serializer = TweetSerializer(tweet)
-        return JsonResponse(serializer.data)
-    
+        return Response(serializer.data)
     elif request.method == "PUT":
-        data = JSONParser().parse(request)
-        serializer = TweetSerializer(tweet,tweet,data=data)
+        serializer = TweetSerializer(tweet,data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return JsonResponse(serializer.data)
-        return JsonResponse(serializer.errors,status=400)
+            return Response(serializer.data)
+        return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
     elif request.method == "DELETE":
         tweet.delete()
-        return HttpResponse(status=204)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    
