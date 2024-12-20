@@ -1,14 +1,17 @@
-from django.urls import path
-from tweetapp.models import Tweet
+from django.urls import path,include
 from tweetapp import views
-from rest_framework.urlpatterns import format_suffix_patterns
+from rest_framework.routers import DefaultRouter
 
+
+router = DefaultRouter()
+
+router.register(r'tweets',views.TweetViewSet,basename="tweet")
+router.register(r'users',views.UserViewSet,basename="user")
+
+ 
+ 
 urlpatterns = [
-    path("",views.api_root,name="tweets"),
-    path("tweets/",views.TweetList.as_view(),name="tweet-list"),
-    path("tweets/<int:pk>/",views.TweetDetail.as_view(),name="tweet-detail"),
-    path("users/",views.UserList.as_view(),name="user-list"),
-    path("users/<int:pk>/",views.UserDetail.as_view(),name="user-detail"),
+    path("",include(router.urls))
 ]
 
-urlpatterns  = format_suffix_patterns(urlpatterns)
+ 
